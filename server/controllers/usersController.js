@@ -1,11 +1,58 @@
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const { generateSign } = require("../middlewares/jwt");
+
+exports.login = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    if (bcrypt.compareSync(req.body.password, user.password)) {
+      const token = generateSign(user._id, user.email);
+      return res.status(200).json({ token, user });
+    } else {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    const token = null;
+    return res.status(200).json(token);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.register = async (req, res) => {
+  try {
+    const data = req.body;
+    const user = new User(data);
+    const newUser = await user.save();
+    return res.status(201).json(newUser);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+
+exports.checksession = async (req, res) => {
+  try {
+    return res.status(200).json(req.user);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
 
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    return res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -15,51 +62,30 @@ exports.getUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    return res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-exports.createUser = async (req, res) => {
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  });
-  try {
-    const newUser = await user.save();
-    res.status(201).json(newUser);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    user.name = req.body.name;
-    user.email = req.body.email;
-    user.password = req.body.password;
-    const updatedUser = await user.save();
-    res.json(updatedUser);
+    const id = req.user._id;
+    const data = req.body;
+    const user = new User(data);
+    user._id = id;
+    await User.findByIdAndUpdate(id, user);
+    return res.status(200).json({ message: "User updated" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    await user.remove();
-    res.json({ message: "User deleted" });
+    await User.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: "User deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

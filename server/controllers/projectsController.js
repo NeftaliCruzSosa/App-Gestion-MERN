@@ -3,9 +3,9 @@ const Project = require("../models/project");
 exports.getProjects = async (req, res) => {
   try {
     const projects = await Project.find();
-    res.json(projects);
+    return res.status(200).json(projects);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -15,59 +15,41 @@ exports.getProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-    res.json(project);
+    return res.status(200).json(project);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 exports.createProject = async (req, res) => {
-  const project = new Project({
-    name: req.body.name,
-    description: req.body.description,
-    team: req.body.team,
-    tasks: req.body.tasks,
-    repository: req.body.repository,
-    notes: req.body.notes,
-    technicalMemory: req.body.technicalMemory,
-  });
+  const data = req.body;
   try {
+    const project = new Project(data);
     const newProject = await project.save();
-    res.status(201).json(newProject);
+    return res.status(201).json(newProject);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
 
 exports.updateProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
-    project.name = req.body.name;
-    project.description = req.body.description;
-    project.team = req.body.team;
-    project.tasks = req.body.tasks;
-    project.repository = req.body.repository;
-    project.notes = req.body.notes;
-    project.technicalMemory = req.body.technicalMemory;
-    const updatedProject = await project.save();
-    res.json(updatedProject);
+    const id = req.params.id;
+    const data = req.body;
+    const project = new Project(data);
+    project._id = id
+    await Project.findByIdAndUpdate(id, project);
+    return res.status(200).json({message: "Project updated"});
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
 
 exports.deleteProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
-    await project.remove();
-    res.json({ message: "Project deleted" });
+    await Project.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: "Project deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

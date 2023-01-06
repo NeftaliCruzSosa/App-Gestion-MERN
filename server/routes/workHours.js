@@ -4,11 +4,14 @@ const router = express.Router();
 // Load controllers
 const workHoursController = require("../controllers/workHoursController");
 
-// Routes for the work hours entity
-router.get("/", workHoursController.getWorkHours);
-router.get("/:id", workHoursController.getWorkHour);
-router.post("/", workHoursController.createWorkHour);
-router.put("/:id", workHoursController.updateWorkHour);
-router.delete("/:id", workHoursController.deleteWorkHour);
+//Load middlewares
+const authenticate = require('../middlewares/auth');
+
+// Securized routes for the work hours entity
+router.get("/", authenticate, workHoursController.getWorkHours);
+router.get("/:id", authenticate, workHoursController.getWorkHour);
+router.post("/", authenticate, workHoursController.createWorkHour);
+router.put("/:id", authenticate, workHoursController.updateWorkHour);
+router.delete("/:id", authenticate, workHoursController.deleteWorkHour);
 
 module.exports = router;

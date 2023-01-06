@@ -17,20 +17,22 @@ app.use(cors());
 
 // Configure express to process incoming requests
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // Load API routes
+const assignments = require("./routes/assignments");
 const teams = require("./routes/teams");
 const users = require("./routes/users");
 const projects = require("./routes/projects");
 const tasks = require("./routes/tasks");
 const workHours = require("./routes/workHours");
 
-app.use("/api/teams", teams);
-app.use("/api/users", users);
-app.use("/api/projects", projects);
-app.use("/api/tasks", tasks);
-app.use("/api/work-hours", workHours);
+app.use("/assignments", assignments)
+app.use("/teams", teams);
+app.use("/users", users);
+app.use("/projects", projects);
+app.use("/tasks", tasks);
+app.use("/work-hours", workHours);
 
 const port = process.env.PORT || 5000;
 

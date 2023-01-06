@@ -2,11 +2,8 @@ const mongoose = require("mongoose");
 
 module.exports = () => {
   mongoose
-    .connect(process.env.DATABASE_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    })
+  .set('strictQuery', false)
+    .connect(process.env.DATABASE_URL)
     .then(() => {
       console.log("Successfully connected to the database");
     })

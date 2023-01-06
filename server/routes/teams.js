@@ -4,11 +4,14 @@ const router = express.Router();
 // Load controllers
 const teamsController = require("../controllers/teamsController");
 
-// Routes for the teams entity
-router.get("/", teamsController.getTeams);
-router.get("/:id", teamsController.getTeam);
-router.post("/", teamsController.createTeam);
-router.put("/:id", teamsController.updateTeam);
-router.delete("/:id", teamsController.deleteTeam);
+//Load middlewares
+const authenticate = require('../middlewares/auth');
+
+// Securized routes for the teams entity
+router.get("/", authenticate, teamsController.getTeams);
+router.get("/:id", authenticate, teamsController.getTeam);
+router.post("/", authenticate, teamsController.createTeam);
+router.put("/:id", authenticate, teamsController.updateTeam);
+router.delete("/:id", authenticate, teamsController.deleteTeam);
 
 module.exports = router;

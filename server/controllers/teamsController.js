@@ -3,9 +3,9 @@ const Team = require("../models/team");
 exports.getTeams = async (req, res) => {
   try {
     const teams = await Team.find();
-    res.json(teams);
+    return res.status(200).json(teams);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -15,51 +15,41 @@ exports.getTeam = async (req, res) => {
     if (!team) {
       return res.status(404).json({ message: "Team not found" });
     }
-    res.json(team);
+    return res.status(200).json(team);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 exports.createTeam = async (req, res) => {
-  const team = new Team({
-    name: req.body.name,
-    description: req.body.description,
-    users: req.body.users,
-  });
+  const data = req.body;
+  const team = new Team(data);
   try {
     const newTeam = await team.save();
-    res.status(201).json(newTeam);
+    return res.status(201).json(newTeam);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
 
 exports.updateTeam = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id);
-    if (!team) {
-      return res.status(404).json({ message: "Team not found" });
-    }
-    team.name = req.body.name;
-    team.description = req.body.description;
-    team.users = req.body.users;
-    const updatedTeam = await team.save();
-    res.json(updatedTeam);
+    const id = req.params.id;
+    const data = req.body;
+    const team = new Team(data);
+    team._id = id
+    await Team.findByIdAndUpdate(id, team);
+    return res.status(200).json({message: "Team updated"});
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
 
 exports.deleteTeam = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id);
-    if (!team) {
-      return res.status(404).json({ message: "Team not found" });
-    }
-    await team.remove();
-    res.json({ message: "Team deleted" });
+    await Team.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: "Team deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

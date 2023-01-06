@@ -4,11 +4,14 @@ const router = express.Router();
 // Load controllers
 const projectsController = require("../controllers/projectsController");
 
-// Routes for the projects entity
-router.get("/", projectsController.getProjects);
-router.get("/:id", projectsController.getProject);
-router.post("/", projectsController.createProject);
-router.put("/:id", projectsController.updateProject);
-router.delete("/:id", projectsController.deleteProject);
+//Load middlewares
+const authenticate = require('../middlewares/auth');
+
+// Securized routes for the projects entity
+router.get("/", authenticate, projectsController.getProjects);
+router.get("/:id", authenticate, projectsController.getProject);
+router.post("/", authenticate, projectsController.createProject);
+router.put("/:id", authenticate, projectsController.updateProject);
+router.delete("/:id", authenticate, projectsController.deleteProject);
 
 module.exports = router;
