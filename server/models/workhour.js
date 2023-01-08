@@ -9,13 +9,12 @@ const workHourSchema = new Schema(
       ref: "User",
       required: true,
     },
-    date: {
+    startTime: {
       type: Date,
       required: true,
     },
-    hours: {
-      type: Number,
-      required: true,
+    endTime: {
+      type: Date,
     },
     task: {
       type: mongoose.Schema.Types.ObjectId,
@@ -24,7 +23,6 @@ const workHourSchema = new Schema(
     },
     commit: {
       type: String,
-      required: true,
     },
   },
   {
@@ -32,6 +30,6 @@ const workHourSchema = new Schema(
   }
 );
 
-const WorkHour = mongoose.model("WorkHour", workHourSchema);
+const WorkHour = mongoose.model("workHours", workHourSchema);
 
 module.exports = WorkHour;
